@@ -4,7 +4,7 @@
   <name>fencie</name>
   <version>0.0.0</version>
   <description>fencie robot URDF and control</description>
-  <maintainer email="ligalog@icloud.com">mark</maintainer>
+  <maintainer email="ligalog@icloud.com">mark smith</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
