@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<!-- materials -->
+
+	<material name="white">
+		<color rgba="1 1 1 1" />
+	</material>
+
+	<material name="orange">
+		<color rgba="1 0.3 0.1 1" />
+	</material>
+
+	<material name="blue">
+		<color rgba="0.2 0.2 1 1" />
+	</material>
+
+	<material name="black">
+		<color rgba="0 0 0 1" />
+	</material>
+
+	<!-- base link -->
+
+	<link name="base_link">
+	</link>
+
+
+	<!-- chassis --> 
+	<joint name="chassis_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="chassis"/>
+		<origin xyz="-0.15 0 0"/>
+	</joint>
+
+	<link name="chassis">
+		<visual>
+			<!-- position chassis origin 150mm relative to the link. 
+			0.15 is 150mm. -->
+			<origin xyz = "0.15 0 0.075"/>
+			<geometry> <!-- 300mm (x) 300mm (y) and 150mm (z) -->
+				<box size="0.3 0.3 0.15"/>
+			</geometry>
+			<material name="white"/>
+		</visual>
+	</link>
+
+
+	<!-- front left wheel -->
+	<joint name="front_left_wheel_joint" type = "continuous">
+		<parent link="base_link"/>
+		<child link="front_left_wheel"/>
+		<origin xyz="0.075 0.15 0" rpy="-${pi/2} 0 0"/>
+		<axis xyz="0 0 1"/>
+	</joint>
+
+	<link name="front_left_wheel">
+		<visual>
+			<geometry> <!-- the weheels are 60mm diameter, 25mm thick. -->
+				<cylinder radius="0.03" length="0.025"/>
+			</geometry>
+			<material name="white"/>
+		</visual>
+	</link>
+
+	<!-- front right wheel -->
+	<joint name="front_right_wheel_joint" type = "continuous">
+		<parent link="base_link"/>
+		<child link="front_right_wheel"/>
+		<origin xyz="0.075 -0.15 0" rpy="${pi/2} 0 0"/>
+		<axis xyz="0 0 -1"/>
+	</joint>
+
+	<link name="front_right_wheel">
+		<visual>
+			<geometry> <!-- the weheels are 60mm diameter, 25mm thick. -->
+				<cylinder radius="0.03" length="0.025"/>
+			</geometry>
+			<material name="white"/>
+		</visual>
+	</link>
+
+	<!-- rear left wheel -->
+	<joint name="rear_left_wheel_joint" type = "continuous">
+		<parent link="base_link"/>
+		<child link="rear_left_wheel"/>
+		<origin xyz="-0.075 0.15 0" rpy="-${pi/2} 0 0"/>
+		<axis xyz="0 0 -1"/>
+	</joint>
+
+	<link name="rear_left_wheel">
+		<visual>
+			<geometry> <!-- the weheels are 60mm diameter, 25mm thick. -->
+				<cylinder radius="0.03" length="0.025"/>
+			</geometry>
+			<material name="white"/>
+		</visual>
+	</link>
+
+	<!-- rear right wheel -->
+	<joint name="rear_right_wheel_joint" type = "continuous">
+		<parent link="base_link"/>
+		<child link="rear_right_wheel"/>
+		<origin xyz="-0.075 -0.15 0" rpy="${pi/2} 0 0"/>
+		<axis xyz="0 0 -1"/>
+	</joint>
+
+	<link name="rear_right_wheel">
+		<visual>
+			<geometry> <!-- the weheels are 60mm diameter, 25mm thick. -->
+				<cylinder radius="0.03" length="0.025"/>
+			</geometry>
+			<material name="white"/>
+		</visual>
+	</link>
+</robot>
