@@ -1,115 +1,54 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
 
-	<!-- materials -->
-
-	<material name="white">
-		<color rgba="1 1 1 1" />
-	</material>
-
-	<material name="orange">
-		<color rgba="1 0.3 0.1 1" />
-	</material>
-
-	<material name="blue">
-		<color rgba="0.2 0.2 1 1" />
-	</material>
-
-	<material name="black">
-		<color rgba="0 0 0 1" />
-	</material>
+	<xacro:include filename="robot.include.xacro" />
 
 	<!-- base link -->
-
 	<link name="base_link">
 	</link>
 
 
-	<!-- chassis --> 
+	<!-- chassis 
+	  setting length/width/height as properties so we can do maths ops with them. 
+	-->
+
+	<!-- 300mm (x) 300mm (y) and 50mm (z) -->
+	<xacro:property name="chassis_length" value="0.3" />
+    <xacro:property name="chassis_width" value="0.3" />
+    <xacro:property name="chassis_height" value="0.05" />
+
 	<joint name="chassis_joint" type="fixed">
 		<parent link="base_link"/>
-		<child link="chassis"/>
-		<origin xyz="-0.15 0 0"/>
+		<child link="chassis_link"/>
+		<origin xyz="-${chassis_length/2} 0 0"/>
 	</joint>
 
-	<link name="chassis">
+
+	<link name="chassis_link">
 		<visual>
-			<!-- position chassis origin 150mm relative to the link. 
-			0.15 is 150mm. -->
-			<origin xyz = "0.15 0 0.075"/>
-			<geometry> <!-- 300mm (x) 300mm (y) and 150mm (z) -->
-				<box size="0.3 0.3 0.15"/>
+			<!-- position chassis origin 1/2 chassis lenght relative to the link. -->
+			<origin xyz = "${chassis_length/2} 0 ${chassis_height/2}"/>
+			<geometry> 
+				<box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
 			</geometry>
-			<material name="white"/>
+			<material name="orange"/>
 		</visual>
+
+		<collision>
+            <origin xyz="${chassis_length/2} 0 ${chassis_height/2}" rpy="0 0 0"/>
+            <geometry>
+                <box size="${chassis_length} ${chassis_width} ${chassis_height}" />
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="0.1" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}">
+            <origin xyz="${chassis_length/2} 0 ${chassis_height/2}" rpy="0 0 0"/>
+        </xacro:inertial_box>
 	</link>
 
+	<xacro:include filename="robot.wheels.xacro" />
 
-	<!-- front left wheel -->
-	<joint name="front_left_wheel_joint" type = "continuous">
-		<parent link="base_link"/>
-		<child link="front_left_wheel"/>
-		<origin xyz="0.075 0.15 0" rpy="-${pi/2} 0 0"/>
-		<axis xyz="0 0 1"/>
-	</joint>
 
-	<link name="front_left_wheel">
-		<visual>
-			<geometry> <!-- the weheels are 60mm diameter, 25mm thick. -->
-				<cylinder radius="0.03" length="0.025"/>
-			</geometry>
-			<material name="white"/>
-		</visual>
-	</link>
+	<xacro:include filename="robot.camera.xacro" />
 
-	<!-- front right wheel -->
-	<joint name="front_right_wheel_joint" type = "continuous">
-		<parent link="base_link"/>
-		<child link="front_right_wheel"/>
-		<origin xyz="0.075 -0.15 0" rpy="${pi/2} 0 0"/>
-		<axis xyz="0 0 -1"/>
-	</joint>
-
-	<link name="front_right_wheel">
-		<visual>
-			<geometry> <!-- the weheels are 60mm diameter, 25mm thick. -->
-				<cylinder radius="0.03" length="0.025"/>
-			</geometry>
-			<material name="white"/>
-		</visual>
-	</link>
-
-	<!-- rear left wheel -->
-	<joint name="rear_left_wheel_joint" type = "continuous">
-		<parent link="base_link"/>
-		<child link="rear_left_wheel"/>
-		<origin xyz="-0.075 0.15 0" rpy="-${pi/2} 0 0"/>
-		<axis xyz="0 0 -1"/>
-	</joint>
-
-	<link name="rear_left_wheel">
-		<visual>
-			<geometry> <!-- the weheels are 60mm diameter, 25mm thick. -->
-				<cylinder radius="0.03" length="0.025"/>
-			</geometry>
-			<material name="white"/>
-		</visual>
-	</link>
-
-	<!-- rear right wheel -->
-	<joint name="rear_right_wheel_joint" type = "continuous">
-		<parent link="base_link"/>
-		<child link="rear_right_wheel"/>
-		<origin xyz="-0.075 -0.15 0" rpy="${pi/2} 0 0"/>
-		<axis xyz="0 0 -1"/>
-	</joint>
-
-	<link name="rear_right_wheel">
-		<visual>
-			<geometry> <!-- the weheels are 60mm diameter, 25mm thick. -->
-				<cylinder radius="0.03" length="0.025"/>
-			</geometry>
-			<material name="white"/>
-		</visual>
-	</link>
+	<xacro:include filename="robot.gazebo.xacro" />
 </robot>

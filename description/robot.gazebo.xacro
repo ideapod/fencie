@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<!-- reset all the colours --> 
+	<gazebo reference="chassis_link">
+  		<material>Gazebo/Orange</material>
+	</gazebo>
+
+	<gazebo reference="front_left_wheel_link">
+  		<material>Gazebo/Black</material>
+	</gazebo>
+
+	<gazebo reference="front_right_wheel_link">
+  		<material>Gazebo/Black</material>
+	</gazebo>
+
+	<gazebo reference="rear_right_wheel_link">
+  		<material>Gazebo/Black</material>
+	</gazebo>
+
+	<gazebo reference="rear_left_wheel_link">
+  		<material>Gazebo/Black</material>
+	</gazebo>
+
+	<gazebo reference="camera_link">
+  		<material>Gazebo/Blue</material>
+	</gazebo>
+
+	<!-- This plugin will publish the joint_states for the selected joints (which robot_state_publisher can then use to broadcast the approprate tf). -->
+	<gazebo>
+		<plugin name="gazebo_ros_joint_state_publisher"
+			filename="libgazebo_ros_joint_state_publisher.so">
+			<update_rate>20</update_rate>
+			<joint_name>front_left_wheel_joint</joint_name>
+			<joint_name>front_right_wheel_joint</joint_name>
+			<joint_name>rear_left_wheel_joint</joint_name>
+			<joint_name>rear_right_wheel_joint</joint_name>
+			<joint_name>camera_joint</joint_name>
+		</plugin>
+	</gazebo>
+
+
+	<!-- This plugin will read a JointTrajectory message from the /set_joint_trajectory topic and move the machine accordingly. It's a bit clunky but it works. -->
+
+    <!-- You'll probably want to add damping to the joints to stop them it flopping around. e.g. 
+    	<dynamics damping="10.0" friction="10.0"/> 
+    -->
+
+	<gazebo>
+		<plugin name="gazebo_ros_joint_pose_trajectory"
+			filename="libgazebo_ros_joint_pose_trajectory.so">
+			<update_rate>2</update_rate>
+		</plugin>
+	</gazebo>
+
+
+	<!-- Due to a quirk of how cameras work, an extra joint/link is required to create an
+            "optical frame" for the sensor. That isn't the focus for this tutorial, but you can
+            look at https://www.ros.org/reps/rep-0103.html#suffix-frames for slightly more information. -->
+    <!-- First, create the link and joint for the optical frame -->
+
+    <joint name="camera_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="-1.571 0 -1.571" />
+        <parent link="camera_link" />
+        <child link="camera_link_optical" />
+    </joint>
+
+    <link name="camera_link_optical"></link>
+
+
+     <!-- Add a gazebo tag for the ORIGINAL camera_link (but in the plugin we reference the optical frame so that ROS can orient things correctly) -->
+    <!-- Within the gazebo tag we have the sensor tag, and inside that there is (among other things) the camera tag with the camera parameters, 
+            and the plugin tag with some extra parameters the plugin needs. -->
+    <!-- Note that although visualise is set to true, it won't actually visualise the depth camera in gazebo. To see the preview, 
+            try swapping "depth" to "camera"-->
+    <gazebo reference="camera_link">
+        <sensor type="camera" name="my_camera">
+            <update_rate>20</update_rate>
+            <visualize>true</visualize>
+            <camera name="cam">
+                <horizontal_fov>1.3962634</horizontal_fov>
+                <image>
+                    <width>640</width>
+                    <height>480</height>
+                    <format>R8B8G8</format>
+                </image>
+                <clip>
+                    <near>0.02</near>
+                    <far>300</far>
+                </clip>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.007</stddev>
+                </noise>
+            </camera>
+            <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+                <frame_name>camera_link_optical</frame_name>
+                <min_depth>0.1</min_depth>
+                <max_depth>500</max_depth>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+
+
+    <!--
+    <gazebo>
+	  <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+	    <updateRate>100.0</updateRate>
+	    <robotNamespace>/</robotNamespace>
+	    <leftFrontJoint>front_left_wheel_joint</leftFrontJoint>
+	    <rightFrontJoint>front_right_wheel_joint</rightFrontJoint>
+	    <leftRearJoint>rear_left_wheel_joint</leftRearJoint>
+	    <rightRearJoint>rear_right_wheel_joint</rightRearJoint>
+	    <wheelSeparation>${chassis_width}</wheelSeparation>
+	    <wheelDiameter>${wheel_radius *2}</wheelDiameter>
+	    <robotBaseFrame>base_link</robotBaseFrame>
+	    <wheelTorque>20</wheelTorque>
+	    <commandTopic>cmd_vel</commandTopic>
+	    <odometryTopic>odom</odometryTopic>
+	    <odometryFrame>odom</odometryFrame>
+	    <broadcastTF>true</broadcastTF>
+	    <covariance_x>0.001</covariance_x>
+	    <covariance_y>0.001</covariance_y> 
+	    <covariance_yaw>0.01</covariance_yaw> 
+	  </plugin>
+	</gazebo> -->
+
+	<gazebo>
+        <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
+            <!-- Wheel Information -->
+            <num_wheel_pairs>2</num_wheel_pairs>
+            <left_joint>front_left_wheel_joint</left_joint>
+            <left_joint>rear_left_wheel_joint</left_joint>
+            <right_joint>front_right_wheel_joint</right_joint>
+            <right_joint>rear_right_wheel_joint</right_joint>
+            <wheel_separation>${chassis_width}</wheel_separation>
+            <wheel_diameter>${wheel_radius * 2}</wheel_diameter>
+
+            <!-- Limits -->
+            <max_wheel_torque>200</max_wheel_torque>
+            <max_wheel_acceleration>10.0</max_wheel_acceleration>
+
+            <!-- Output -->
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            <publish_wheel_tf>true</publish_wheel_tf>
+        </plugin>
+    </gazebo>
+</robot>

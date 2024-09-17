@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="camera_height" value="0.15" />
+    <xacro:property name="camera_width" value="0.15" />
+    <xacro:property name="camera_length" value="0.06" />
+
+    <xacro:property name="lens_radius" value="0.04" />
+    <xacro:property name="lens_length" value="0.06" />
+	<!-- camera_joint describes where the camera is relative to the arm -->
+    <!-- - Even though the camera isn't moving relative to the arm, it will probably be helpful to have its own link/frame rather than just adding more visuals to the arm -->
+    <!-- - For this example, the camera_link origin will be at the centre of the camera's "sensor" -->
+    <joint name="camera_joint" type="fixed">
+        <origin xyz="${chassis_length} 0 ${chassis_height + camera_height /2}" rpy="0 0 0"/>
+        <parent link="chassis_link"/>
+        <child link="camera_link"/>        
+    </joint>
+
+    <!-- camera_link describes the camera at the end of the arm -->
+    <!-- - It has multiple visual elements, which ultimately get combined together -->
+    <!-- - Even if we specify different materials, RViz will just colour them all the same as the first -->
+    <!-- - Although we could also specify multiple collision geometries, instead we just use a single box that encompasses the whole camera -->
+    <link name="camera_link">
+        <visual> <!-- camera body -->
+            <origin xyz="-${camera_length /2} 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${camera_length} ${camera_width} ${camera_height}" />
+            </geometry>
+            <material name="white" />
+        </visual>
+        <visual> <!-- camera lens -->
+            <origin xyz="${camera_length /2} 0 0" rpy="0 ${pi/2} 0"/>
+            <geometry>
+                <cylinder length="${lens_length}" radius="${lens_radius}" />
+            </geometry>
+            <material name="blue" />
+        </visual>
+        <collision>
+            <origin xyz="0.0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${camera_length * 2} ${camera_width} ${camera_height}" />
+            </geometry>
+        </collision>
+        <xacro:inertial_box mass="0.1" x="${camera_length *2}" y="${camera_width}" z="${camera_height}">
+            <origin xyz="0.0 0 0" rpy="0 0 0"/>
+        </xacro:inertial_box>
+    </link>
+</robot>
