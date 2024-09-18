@@ -5,14 +5,15 @@
 	<xacro:property name="wheel_length" value="0.03" />
     <xacro:property name="wheel_radius" value="0.025" />
     <xacro:property name="wheel_mass" value="1.0"/>
+    <xacro:property name="wheel_damping" value="5.0"/>
+    <xacro:property name="wheel_friction" value="5.0"/>
 
 	<!-- front left wheel -->
 	<xacro:wheel_joint 
 		name="front_left_wheel_joint" 
-		parent="base_link" 
-		child="front_left_wheel_link" 
+		parent="base_link" child="front_left_wheel_link" 
 		xyz="${chassis_length/4} ${chassis_length/2 + wheel_length/2} 0" 
-		side="left">
+		side="left" damping="${wheel_damping}" friction="${wheel_friction}">
 	</xacro:wheel_joint>
 	
 	<xacro:wheel_link 
@@ -25,10 +26,9 @@
 	<!-- front right wheel -->
 	<xacro:wheel_joint 
 		name="front_right_wheel_joint" 
-		parent="base_link" 
-		child="front_right_wheel_link" 
+		parent="base_link" child="front_right_wheel_link" 
 		xyz="${chassis_length/4} -${chassis_length/2 + wheel_length/2} 0" 
-		side="right">
+		side="right" damping="${wheel_damping}" friction="${wheel_friction}">
 	</xacro:wheel_joint>
 	
 	<xacro:wheel_link 
@@ -41,10 +41,9 @@
 	<!-- rear left wheel -->
 	<xacro:wheel_joint 
 		name="rear_left_wheel_joint" 
-		parent="base_link" 
-		child="rear_left_wheel_link" 
+		parent="base_link" child="rear_left_wheel_link" 
 		xyz="-${chassis_length/4} ${chassis_length/2 + wheel_length/2} 0" 
-		side="left">
+		side="left" damping="${wheel_damping}" friction="${wheel_friction}">
 	</xacro:wheel_joint>
 	
 	<xacro:wheel_link 
@@ -57,10 +56,9 @@
 	<!-- rear right wheel -->
 	<xacro:wheel_joint 
 		name="rear_right_wheel_joint" 
-		parent="base_link" 
-		child="rear_right_wheel_link" 
+		parent="base_link" child="rear_right_wheel_link" 
 		xyz="-${chassis_length/4} -${chassis_length/2 + wheel_length/2} 0"
-		side="right">
+		side="right" damping="${wheel_damping}" friction="${wheel_friction}">
 	</xacro:wheel_joint>
 	
 	<xacro:wheel_link 
