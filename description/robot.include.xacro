@@ -38,22 +38,21 @@
     </xacro:macro>
 
 
-    <xacro:macro name="wheel_joint" params="name parent child xyz side damping friction">
+    <xacro:macro name="wheel_joint" params="name parent child xyz side damping friction max_effort max_velocity">
       <joint name="${name}" type="continuous">
         <parent link="${parent}" />
         <child link="${child}" />
 
         <xacro:if value="${side == 'left'}">
             <origin xyz="${xyz}" rpy="-${pi/2} 0 0"/>
-            <axis xyz="0 0 1"/>
+            <axis xyz="0 0 -1"/>
         </xacro:if>
         <xacro:if value="${side == 'right'}">
             <origin xyz="${xyz}" rpy="${pi/2} 0 0"/>
-            <axis xyz="0 0 -1"/>
+            <axis xyz="0 0 1"/>
         </xacro:if>
-
-        
         <dynamics damping="${damping}" friction="${friction}"/>     
+        <limit effort="${max_effort}" velocity="${max_velocity}"/>
       </joint>
     </xacro:macro>
     <!--<joint_properties damping="1.0" friction="1.0"/> -->
@@ -75,10 +74,25 @@
                 </geometry>
             </collision>
             <xacro:inertial_cylinder mass="${in_mass}" length="${in_length}" radius="${in_radius}">
+                <!-- I think the origin is the centre of mass - middle of the cylinder -->
                 <origin xyz="0 0 0" rpy="0 0 0"/>
             </xacro:inertial_cylinder>
         </link>
     </xacro:macro>
+
+
+    <xacro:macro name="ros2control_wheel" params="joint_name cmd_min cmd_max">
+        <joint name="${joint_name}">
+            <command_interface name="velocity">
+                <param name="min">${cmd_min}</param>
+                <param name="max">${cmd_max}</param>
+            </command_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="position"/>
+        </joint>
+    </xacro:macro>
+
+
 
     <!-- materials -->
 

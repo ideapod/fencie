@@ -2,18 +2,21 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 <!-- all the wheels -->
-	<xacro:property name="wheel_length" value="0.03" />
-    <xacro:property name="wheel_radius" value="0.025" />
-    <xacro:property name="wheel_mass" value="1.0"/>
-    <xacro:property name="wheel_damping" value="5.0"/>
-    <xacro:property name="wheel_friction" value="5.0"/>
+	<xacro:property name="wheel_length" value="0.025" />
+    <xacro:property name="wheel_radius" value="0.03" />
+    <xacro:property name="wheel_mass" value="0.027"/>
+    <xacro:property name="wheel_damping" value="1.0"/>
+    <xacro:property name="wheel_friction" value="1.0"/>
+    <xacro:property name="wheel_max_effort" value="0.5"/>
+    <xacro:property name="wheel_max_velocity" value="1.0"/>
 
 	<!-- front left wheel -->
 	<xacro:wheel_joint 
 		name="front_left_wheel_joint" 
 		parent="base_link" child="front_left_wheel_link" 
 		xyz="${chassis_length/4} ${chassis_length/2 + wheel_length/2} 0" 
-		side="left" damping="${wheel_damping}" friction="${wheel_friction}">
+		side="left" damping="${wheel_damping}" friction="${wheel_friction}"
+		max_effort="${wheel_max_effort}" max_velocity="${wheel_max_velocity}">
 	</xacro:wheel_joint>
 	
 	<xacro:wheel_link 
@@ -28,7 +31,8 @@
 		name="front_right_wheel_joint" 
 		parent="base_link" child="front_right_wheel_link" 
 		xyz="${chassis_length/4} -${chassis_length/2 + wheel_length/2} 0" 
-		side="right" damping="${wheel_damping}" friction="${wheel_friction}">
+		side="right" damping="${wheel_damping}" friction="${wheel_friction}" 
+		max_effort="${wheel_max_effort}" max_velocity="${wheel_max_velocity}">
 	</xacro:wheel_joint>
 	
 	<xacro:wheel_link 
@@ -43,7 +47,8 @@
 		name="rear_left_wheel_joint" 
 		parent="base_link" child="rear_left_wheel_link" 
 		xyz="-${chassis_length/4} ${chassis_length/2 + wheel_length/2} 0" 
-		side="left" damping="${wheel_damping}" friction="${wheel_friction}">
+		side="left" damping="${wheel_damping}" friction="${wheel_friction}"
+		max_effort="${wheel_max_effort}" max_velocity="${wheel_max_velocity}">
 	</xacro:wheel_joint>
 	
 	<xacro:wheel_link 
@@ -58,7 +63,8 @@
 		name="rear_right_wheel_joint" 
 		parent="base_link" child="rear_right_wheel_link" 
 		xyz="-${chassis_length/4} -${chassis_length/2 + wheel_length/2} 0"
-		side="right" damping="${wheel_damping}" friction="${wheel_friction}">
+		side="right" damping="${wheel_damping}" friction="${wheel_friction}"
+		max_effort="${wheel_max_effort}" max_velocity="${wheel_max_velocity}">
 	</xacro:wheel_joint>
 	
 	<xacro:wheel_link 

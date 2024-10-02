@@ -1,6 +1,28 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"  name="robot">
 
+     <xacro:arg name="use_ros2_control" default="true"/>
+
+    <!-- define the robot structure -->
     <xacro:include filename="robot.core.xacro" />
 
+    <!-- gazebo materials definitions and gazebo reporting joint states and camera feed from sim. --> 
+    <xacro:include filename="robot.gazebo.xacro" />
+
+    <!-- gazebo represents and controls the robot via diff drive.  camera etc 
+        comment out when using either gazebo or hardware ros2 control. --> 
+    <!-- <xacro:include filename="robot.gazebo.control.xacro" /> --> 
+    
+    <!-- make a choice about ros control - hardware or simulation -->
+    <xacro:if value="$(arg use_ros2_control)">
+        <!-- USE ROS2 CONTROL is true --> 
+        <xacro:include filename="robot.ros2.control.xacro" />
+    </xacro:if>
+
+    <xacro:unless value="$(arg use_ros2_control)">
+        <!-- USE ROS2 CONTROL is false --> 
+        <xacro:include filename="robot.gazebo.roscontrol.xacro" />
+    </xacro:unless>
+
+    <!-- Should have chosen one by now --> 
 </robot>

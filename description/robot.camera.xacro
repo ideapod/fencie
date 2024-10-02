@@ -1,12 +1,14 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:property name="camera_height" value="0.15" />
-    <xacro:property name="camera_width" value="0.15" />
-    <xacro:property name="camera_length" value="0.06" />
+    <xacro:property name="camera_height" value="0.05" />
+    <xacro:property name="camera_width" value="0.05" />
+    <xacro:property name="camera_length" value="0.03" />
+    <xacro:property name="camera_mass" value="0.1" />
 
-    <xacro:property name="lens_radius" value="0.04" />
-    <xacro:property name="lens_length" value="0.06" />
+    <xacro:property name="lens_radius" value="0.01" />
+    <xacro:property name="lens_length" value="0.03" />
+    <xacro:property name="camera_weight" value="0.03" />
 	<!-- camera_joint describes where the camera is relative to the arm -->
     <!-- - Even though the camera isn't moving relative to the arm, it will probably be helpful to have its own link/frame rather than just adding more visuals to the arm -->
     <!-- - For this example, the camera_link origin will be at the centre of the camera's "sensor" -->
@@ -41,8 +43,21 @@
                 <box size="${camera_length * 2} ${camera_width} ${camera_height}" />
             </geometry>
         </collision>
-        <xacro:inertial_box mass="0.1" x="${camera_length *2}" y="${camera_width}" z="${camera_height}">
+        <xacro:inertial_box mass="${camera_mass}" x="${camera_length *2}" y="${camera_width}" z="${camera_height}">
             <origin xyz="0.0 0 0" rpy="0 0 0"/>
         </xacro:inertial_box>
     </link>
+
+    <!-- Due to a quirk of how cameras work, an extra joint/link is required to create an
+            "optical frame" for the sensor. That isn't the focus for this tutorial, but you can
+            look at https://www.ros.org/reps/rep-0103.html#suffix-frames for slightly more information. -->
+    <!-- First, create the link and joint for the optical frame -->
+
+    <joint name="camera_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="-1.571 0 -1.571" />
+        <parent link="camera_link" />
+        <child link="camera_link_optical" />
+    </joint>
+
+    <link name="camera_link_optical"></link>
 </robot>
