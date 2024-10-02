@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <ros2_control name="FencieRobot" type="system">
+        <hardware>
+          <plugin>fencie_drive_hardware_interface/FencieDriveSystemHardware</plugin>
+          <param name="quad_velocity_topic">/quad_motor_velocities</param>
+          <param name="quad_encoder_topic">/quad_motor_encoder</param>
+        </hardware>
+
+
+        <xacro:ros2control_wheel joint_name="front_left_wheel_joint" cmd_min="-${wheel_max_velocity}" cmd_max="${wheel_max_velocity}">
+        </xacro:ros2control_wheel>
+
+         <xacro:ros2control_wheel joint_name="front_right_wheel_joint" cmd_min="-${wheel_max_velocity}" cmd_max="${wheel_max_velocity}">
+        </xacro:ros2control_wheel>
+
+         <xacro:ros2control_wheel joint_name="rear_left_wheel_joint" cmd_min="-${wheel_max_velocity}" cmd_max="${wheel_max_velocity}">
+        </xacro:ros2control_wheel>
+
+        <xacro:ros2control_wheel joint_name="rear_right_wheel_joint" cmd_min="-${wheel_max_velocity}" cmd_max="${wheel_max_velocity}">
+        </xacro:ros2control_wheel>
+    </ros2_control>
+    
+    <gazebo> <!-- this makes gazebo run controller manager --> 
+        <plugin name='gazebo_ros2_control' filename='libgazebo_ros2_control.so'>
+            <parameters>
+               $(find fencie)/config/my_controllers.yaml
+            </parameters>
+        </plugin>
+    </gazebo>
+</robot>
