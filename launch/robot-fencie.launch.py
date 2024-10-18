@@ -1,11 +1,12 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, TimerAction, RegisterEventHandler
+from launch.event_handlers import OnProcessStart
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-
-
 from launch_ros.actions import Node
+from launch.substitutions import Command
+import launch_ros.descriptions
 import xacro
 
 
@@ -16,38 +17,67 @@ def generate_launch_description():
     file_subpath = 'description/robot.urdf.xacro'
 
 
-    # Use xacro to process the file
-    xacro_file = os.path.join(get_package_share_directory(pkg_name),file_subpath)
-    robot_description_raw = xacro.process_file(xacro_file).toxml()
-
-
-    # Configure the node
-    node_robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        output='screen',
-        parameters=[{'robot_description': robot_description_raw,
-        'use_sim_time': True}] # add other parameters here if required
+    rsp = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory(pkg_name), 'launch','rsp.launch.py'
+            )]), 
+        launch_arguments={'use_sim_time':'true', 'use_ros2_control': 'true'}.items()
     )
 
+    controller_params_file = os.path.join(get_package_share_directory(pkg_name),'config','my_bot_controllers.yaml')
+    
+    robot_description = Command(['ros2 param get --hide-type /robot_state_publisher robot_description'])
 
+
+
+    # use this when ros2 control in use
     controller_manager = Node(
-        package='controller_manager',
-        executable='ros2_control_node',
-        parameters=[XXXXXXXXX],
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[
+            {'robot_description': 
+            launch_ros.parameter_descriptions.ParameterValue(
+                robot_description, value_type=str)
+            },
+            controller_params_file
+        ]
+    )
+
+    delayed_controller_manager = TimerAction(period=3.0, actions=[controller_manager])
+
+    # use this when ros2 control in use
+    diff_drive_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["diff_cont"],
+    )
+
+    delayed_diff_drive_spawner = RegisterEventHandler(
+        event_handler=OnProcessStart(
+            target_action=controller_manager,
+            on_start=[diff_drive_spawner],
         )
+    )
 
-    spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
-                    arguments=['-topic', 'robot_description',
-                                '-entity', 'fencie'],
-                    output='screen')
+    joint_broad_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["joint_broad"],
+    )
 
+    delayed_joint_broad_spawner = RegisterEventHandler(
+        event_handler=OnProcessStart(
+            target_action=controller_manager,
+            on_start=[joint_broad_spawner],
+        )
+    )
 
     # Run the node
     return LaunchDescription([
-        gazebo,
-        node_robot_state_publisher,
-        spawn_entity
+        rsp,
+        delayed_controller_manager,
+        delayed_diff_drive_spawner,
+        delayed_joint_broad_spawner
     ])
 
 

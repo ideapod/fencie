@@ -1,7 +1,7 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, Timer
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
@@ -21,7 +21,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory(pkg_name), 'launch','rsp.launch.py'
             )]), 
-        launch_arguments={'use_sim_time':'true', 'use_ros2_control': 'false'}.items()
+        launch_arguments={'use_sim_time':'false', 'use_ros2_control': 'true'}.items()
     )
 
     gazebo_params_file = os.path.join(get_package_share_directory(pkg_name),'config','gazebo_params.yaml')

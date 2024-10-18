@@ -1,3 +1,4 @@
+# use this when controlling with gazebo based ros2 control.
 controller_manager:
     ros__parameters:
         update_rate: 30
